@@ -1,7 +1,7 @@
 {
-  "name": "react-intercom",
-  "version": "1.0.15",
-  "description": "A component to initialize Intercom in your application",
+  "name": "react-helpcrunch",
+  "version": "0.0.1",
+  "description": "A component to initialize HelpCrunch in your application",
   "main": "lib/index.js",
   "dependencies": {
     "prop-types": "15.5.8"
@@ -19,12 +19,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nhagen/react-intercom.git"
+    "url": "git+https://github.com/justinvelluppillai/react-helpcrunch.git"
   },
-  "author": "Nathan Hagen",
+  "author": "Justin Velluppillai",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nhagen/react-intercom/issues"
+    "url": "https://github.com/justinvelluppillai/react-helpcrunch/issues"
   },
-  "homepage": "https://github.com/nhagen/react-intercom#readme"
+  "homepage": "https://github.com/justinvelluppillai/react-helpcrunch#readme"
 }
