@@ -1,85 +1,115 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
+
 const canUseDOM = !!(
-  (typeof window !== 'undefined' &&
-  window.document && window.document.createElement)
+    (typeof window !== 'undefined' &&
+        window.document && window.document.createElement)
 );
 
-export const IntercomAPI = (...args) => {
-  if (canUseDOM && window.Intercom) {
-    window.Intercom.apply(null, args);
-  } else {
-    console.warn('Intercom not initialized yet');
-  }
+export const HelpCrunchAPI = (...args) => {
+    if (canUseDOM && window.HelpCrunch) {
+        window.HelpCrunch.apply(null, args);
+    } else {
+        console.warn('HelpCrunch not initialized yet');
+    }
 };
 
-export default class Intercom extends Component {
-  static propTypes = {
-    appID: PropTypes.string.isRequired,
-  };
+export default class HelpCrunch extends Component {
+    static propTypes = {
+        appID: PropTypes.string.isRequired,
+        appSecret: PropTypes.string.isRequired
+    };
 
-  static displayName = 'Intercom';
+    static displayName = 'HelpCrunch';
 
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    const {
-      appID,
-      ...otherProps,
-    } = props;
+        const {
+            appID,
+            appSecret,
+            ...otherProps
+        } = props;
 
-    if (!appID || !canUseDOM) {
-      return;
-    }
-
-    if (!window.Intercom) {
-      (function(w, d, id, s, x) {
-        function i() {
-            i.c(arguments);
+        if (!appID || !canUseDOM) {
+            return;
         }
-        i.q = [];
-        i.c = function(args) {
-            i.q.push(args);
-        };
-        w.Intercom = i;
-        s = d.createElement('script');
-        s.async = 1;
-        s.src = 'https://widget.intercom.io/widget/' + id;
-        d.head.appendChild(s);
-      })(window, document, appID);
+      
+        if (!window.HelpCrunch) {
+            (function (w, d) {
+                w.HelpCrunch = function () {
+                    w.HelpCrunch.q.push(arguments);
+                };
+                w.HelpCrunch.q = [];
+
+                function r() {
+                    var s = d.createElement('script');
+                    s.async = 1;
+                    s.type = "text/javascript";
+                    s.src = "https://widget.helpcrunch.com/";
+                    (d.body || d.head).appendChild(s);
+                }
+
+                if (w.attachEvent) {
+                    w.attachEvent('onload', r);
+                } else {
+                    w.addEventListener('load', r, false);
+                }
+            })(window, document);
+        }
+
+        window.HelpCrunchSettings = {...otherProps, applicationId: appID, applicationSecret: appSecret};
+
+        if (window.HelpCrunch) {
+            window.HelpCrunch('init', 'writemaps', window.HelpCrunchSettings);
+            window.HelpCrunch('showChatWidget');
+        }
     }
 
-    window.intercomSettings = { ...otherProps, app_id: appID };
+    componentWillReceiveProps(nextProps) {
+        const {
+            appID,
+            appSecret,
+            ...otherProps
+        } = nextProps;
 
-    if (window.Intercom) {
-      window.Intercom('boot', otherProps);
+        if (!canUseDOM) {
+            return;
+        }
+
+        window.HelpCrunchSettings = { ...otherProps, applicationId: appID, applicationSecret: appSecret }
+
+        if (window.HelpCrunch) {
+            if (this.loggedIn(this.props) && !this.loggedIn(nextProps)) {
+                window.HelpCrunch('hideChatWidget');
+                window.HelpCrunch('init', 'writemaps', window.HelpCrunchSettings);
+            } else {
+                window.HelpCrunch('updateUser', otherProps);
+            }
+            window.HelpCrunch('showChatWidget');
+        }
     }
-  }
 
-  componentWillReceiveProps(nextProps) {
-    const {
-      appID,
-      ...otherProps,
-    } = nextProps;
+    componentWillUnmount() {
+        if (!canUseDOM || !window.HelpCrunch) {
+            return false;
+        }
 
-    if (!canUseDOM) return;
+        window.HelpCrunch('hideChatWidget');
 
-    window.intercomSettings = { ...otherProps, app_id: appID };
-
-    if (window.Intercom) {
-      if (this.loggedIn(this.props) && !this.loggedIn(nextProps)) {
-        // Shutdown and boot each time the user logs out to clear conversations
-        window.Intercom('shutdown');
-        window.Intercom('boot', otherProps);
-      } else {
-        window.Intercom('update', otherProps);
-      }
+        delete window.HelpCrunch;
+        delete window.HelpCrunchSettings;
     }
-  }
 
-  shouldComponentUpdate() {
-    return false;
-  }
+    loggedIn(props) {
+        return props.email || props.user_id;
+    }
+
+    render() {
+        return false;
+    }
+}
+
 
   componentWillUnmount() {
     if (!canUseDOM || !window.Intercom) return false;
