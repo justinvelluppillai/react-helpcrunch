@@ -17,7 +17,8 @@ export const HelpCrunchAPI = (...args) => {
 export default class HelpCrunch extends Component {
     static propTypes = {
         appID: PropTypes.string.isRequired,
-        appSecret: PropTypes.string.isRequired
+        appSecret: PropTypes.string.isRequired,
+        appDomain: PropTypes.string.isRequired
     };
 
     static displayName = 'HelpCrunch';
@@ -28,6 +29,7 @@ export default class HelpCrunch extends Component {
         const {
             appID,
             appSecret,
+            appDomain,
             ...otherProps
         } = props;
 
@@ -61,7 +63,7 @@ export default class HelpCrunch extends Component {
         window.HelpCrunchSettings = {...otherProps, applicationId: appID, applicationSecret: appSecret};
 
         if (window.HelpCrunch) {
-            window.HelpCrunch('init', 'writemaps', window.HelpCrunchSettings);
+            window.HelpCrunch('init', appDomain, window.HelpCrunchSettings);
             window.HelpCrunch('showChatWidget');
         }
     }
@@ -70,6 +72,7 @@ export default class HelpCrunch extends Component {
         const {
             appID,
             appSecret,
+            appDomain,
             ...otherProps
         } = nextProps;
 
@@ -82,7 +85,7 @@ export default class HelpCrunch extends Component {
         if (window.HelpCrunch) {
             if (this.loggedIn(this.props) && !this.loggedIn(nextProps)) {
                 window.HelpCrunch('hideChatWidget');
-                window.HelpCrunch('init', 'writemaps', window.HelpCrunchSettings);
+                window.HelpCrunch('init', appDomain, window.HelpCrunchSettings);
             } else {
                 window.HelpCrunch('updateUser', otherProps);
             }
